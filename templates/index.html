@@ -1,84 +1,417 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI-Enhanced Intrusion Detection</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Solar Web Attack Prediction</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #FFD700, #FF8C00);
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            color: #FF4500;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .form-label {
+            color: #FF8C00;
+            font-weight: bold;
+        }
+        .form-control {
+            border: 2px solid #FFD700;
+            border-radius: 5px;
+        }
+        .form-control:focus {
+            border-color: #FF4500;
+            box-shadow: 0 0 5px rgba(255, 69, 0, 0.5);
+        }
+        .btn-primary {
+            background-color: #FF4500;
+            border: none;
+            padding: 10px 20px;
+            font-size: 18px;
+            transition: background-color 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #FF6347;
+        }
+        .alert {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .alert-success {
+            background-color: #FFD700;
+            color: #333;
+        }
+        .alert-danger {
+            background-color: #FF4500;
+            color: #fff;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
-    <div class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
-        <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">AI-Enhanced Intrusion Detection</h1>
-        
-        <form class="space-y-4">
-            <div>
-                <label for="flow_duration" class="block text-sm font-medium text-gray-700">Flow Duration</label>
-                <input type="text" id="flow_duration" name="flow_duration" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Enter flow duration">
+<body>
+    <div class="container">
+        <h1>AI enhanced-intrusion-detection-system</h1>
+        <form action="/predict" method="POST">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="Flow ID" class="form-label">Flow ID</label>
+                    <input type="text" class="form-control" id="Flow ID" name="Flow ID" placeholder="e.g., 62015" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Source IP" class="form-label">Source IP</label>
+                    <input type="text" class="form-control" id="Source IP" name="Source IP" placeholder="e.g., 1261" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Source Port" class="form-label">Source Port</label>
+                    <input type="text" class="form-control" id="Source Port" name="Source Port" placeholder="e.g., 51885.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Destination IP" class="form-label">Destination IP</label>
+                    <input type="text" class="form-control" id="Destination IP" name="Destination IP" placeholder="e.g., 1599" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Destination Port" class="form-label">Destination Port</label>
+                    <input type="text" class="form-control" id="Destination Port" name="Destination Port" placeholder="e.g., 53.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Protocol" class="form-label">Protocol</label>
+                    <input type="text" class="form-control" id="Protocol" name="Protocol" placeholder="e.g., 17.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Timestamp" class="form-label">Timestamp</label>
+                    <input type="text" class="form-control" id="Timestamp" name="Timestamp" placeholder="e.g., 181" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Flow Duration" class="form-label">Flow Duration</label>
+                    <input type="text" class="form-control" id="Flow Duration" name="Flow Duration" placeholder="e.g., 76978.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Total Fwd Packets" class="form-label">Total Fwd Packets</label>
+                    <input type="text" class="form-control" id="Total Fwd Packets" name="Total Fwd Packets" placeholder="e.g., 2.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Total Backward Packets" class="form-label">Total Backward Packets</label>
+                    <input type="text" class="form-control" id="Total Backward Packets" name="Total Backward Packets" placeholder="e.g., 2.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Total Length of Fwd Packets" class="form-label">Total Length of Fwd Packets</label>
+                    <input type="text" class="form-control" id="Total Length of Fwd Packets" name="Total Length of Fwd Packets" placeholder="e.g., 78.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Total Length of Bwd Packets" class="form-label">Total Length of Bwd Packets</label>
+                    <input type="text" class="form-control" id="Total Length of Bwd Packets" name="Total Length of Bwd Packets" placeholder="e.g., 206.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Fwd Packet Length Max" class="form-label">Fwd Packet Length Max</label>
+                    <input type="text" class="form-control" id="Fwd Packet Length Max" name="Fwd Packet Length Max" placeholder="e.g., 39.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Fwd Packet Length Min" class="form-label">Fwd Packet Length Min</label>
+                    <input type="text" class="form-control" id="Fwd Packet Length Min" name="Fwd Packet Length Min" placeholder="e.g., 39.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Fwd Packet Length Mean" class="form-label">Fwd Packet Length Mean</label>
+                    <input type="text" class="form-control" id="Fwd Packet Length Mean" name="Fwd Packet Length Mean" placeholder="e.g., 39.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Fwd Packet Length Std" class="form-label">Fwd Packet Length Std</label>
+                    <input type="text" class="form-control" id="Fwd Packet Length Std" name="Fwd Packet Length Std" placeholder="e.g., 0.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Bwd Packet Length Max" class="form-label">Bwd Packet Length Max</label>
+                    <input type="text" class="form-control" id="Bwd Packet Length Max" name="Bwd Packet Length Max" placeholder="e.g., 103.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Bwd Packet Length Min" class="form-label">Bwd Packet Length Min</label>
+                    <input type="text" class="form-control" id="Bwd Packet Length Min" name="Bwd Packet Length Min" placeholder="e.g., 103.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Bwd Packet Length Mean" class="form-label">Bwd Packet Length Mean</label>
+                    <input type="text" class="form-control" id="Bwd Packet Length Mean" name="Bwd Packet Length Mean" placeholder="e.g., 103.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Bwd Packet Length Std" class="form-label">Bwd Packet Length Std</label>
+                    <input type="text" class="form-control" id="Bwd Packet Length Std" name="Bwd Packet Length Std" placeholder="e.g., 0.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Flow Bytes/s" class="form-label">Flow Bytes/s</label>
+                    <input type="text" class="form-control" id="Flow Bytes/s" name="Flow Bytes/s" placeholder="e.g., 3689.365793" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Flow Packets/s" class="form-label">Flow Packets/s</label>
+                    <input type="text" class="form-control" id="Flow Packets/s" name="Flow Packets/s" placeholder="e.g., 51.96289849" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Flow IAT Mean" class="form-label">Flow IAT Mean</label>
+                    <input type="text" class="form-control" id="Flow IAT Mean" name="Flow IAT Mean" placeholder="e.g., 25659.33333" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Flow IAT Std" class="form-label">Flow IAT Std</label>
+                    <input type="text" class="form-control" id="Flow IAT Std" name="Flow IAT Std" placeholder="e.g., 44436.34082" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Flow IAT Max" class="form-label">Flow IAT Max</label>
+                    <input type="text" class="form-control" id="Flow IAT Max" name="Flow IAT Max" placeholder="e.g., 76970.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Flow IAT Min" class="form-label">Flow IAT Min</label>
+                    <input type="text" class="form-control" id="Flow IAT Min" name="Flow IAT Min" placeholder="e.g., 4.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Fwd IAT Total" class="form-label">Fwd IAT Total</label>
+                    <input type="text" class="form-control" id="Fwd IAT Total" name="Fwd IAT Total" placeholder="e.g., 4.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Fwd IAT Mean" class="form-label">Fwd IAT Mean</label>
+                    <input type="text" class="form-control" id="Fwd IAT Mean" name="Fwd IAT Mean" placeholder="e.g., 4.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Fwd IAT Std" class="form-label">Fwd IAT Std</label>
+                    <input type="text" class="form-control" id="Fwd IAT Std" name="Fwd IAT Std" placeholder="e.g., 0.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Fwd IAT Max" class="form-label">Fwd IAT Max</label>
+                    <input type="text" class="form-control" id="Fwd IAT Max" name="Fwd IAT Max" placeholder="e.g., 4.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Fwd IAT Min" class="form-label">Fwd IAT Min</label>
+                    <input type="text" class="form-control" id="Fwd IAT Min" name="Fwd IAT Min" placeholder="e.g., 4.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Bwd IAT Total" class="form-label">Bwd IAT Total</label>
+                    <input type="text" class="form-control" id="Bwd IAT Total" name="Bwd IAT Total" placeholder="e.g., 4.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Bwd IAT Mean" class="form-label">Bwd IAT Mean</label>
+                    <input type="text" class="form-control" id="Bwd IAT Mean" name="Bwd IAT Mean" placeholder="e.g., 4.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Bwd IAT Std" class="form-label">Bwd IAT Std</label>
+                    <input type="text" class="form-control" id="Bwd IAT Std" name="Bwd IAT Std" placeholder="e.g., 0.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Bwd IAT Max" class="form-label">Bwd IAT Max</label>
+                    <input type="text" class="form-control" id="Bwd IAT Max" name="Bwd IAT Max" placeholder="e.g., 4.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Bwd IAT Min" class="form-label">Bwd IAT Min</label>
+                    <input type="text" class="form-control" id="Bwd IAT Min" name="Bwd IAT Min" placeholder="e.g., 4.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Fwd PSH Flags" class="form-label">Fwd PSH Flags</label>
+                    <input type="text" class="form-control" id="Fwd PSH Flags" name="Fwd PSH Flags" placeholder="e.g., 0.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Bwd PSH Flags" class="form-label">Bwd PSH Flags</label>
+                    <input type="text" class="form-control" id="Bwd PSH Flags" name="Bwd PSH Flags" placeholder="e.g., 0.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Fwd URG Flags" class="form-label">Fwd URG Flags</label>
+                    <input type="text" class="form-control" id="Fwd URG Flags" name="Fwd URG Flags" placeholder="e.g., 0.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Bwd URG Flags" class="form-label">Bwd URG Flags</label>
+                    <input type="text" class="form-control" id="Bwd URG Flags" name="Bwd URG Flags" placeholder="e.g., 0.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Fwd Header Length" class="form-label">Fwd Header Length</label>
+                    <input type="text" class="form-control" id="Fwd Header Length" name="Fwd Header Length" placeholder="e.g., 64.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Bwd Header Length" class="form-label">Bwd Header Length</label>
+                    <input type="text" class="form-control" id="Bwd Header Length" name="Bwd Header Length" placeholder="e.g., 64.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Fwd Packets/s" class="form-label">Fwd Packets/s</label>
+                    <input type="text" class="form-control" id="Fwd Packets/s" name="Fwd Packets/s" placeholder="e.g., 25.98144925" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Bwd Packets/s" class="form-label">Bwd Packets/s</label>
+                    <input type="text" class="form-control" id="Bwd Packets/s" name="Bwd Packets/s" placeholder="e.g., 25.98144925" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Min Packet Length" class="form-label">Min Packet Length</label>
+                    <input type="text" class="form-control" id="Min Packet Length" name="Min Packet Length" placeholder="e.g., 39.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Max Packet Length" class="form-label">Max Packet Length</label>
+                    <input type="text" class="form-control" id="Max Packet Length" name="Max Packet Length" placeholder="e.g., 103.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Packet Length Mean" class="form-label">Packet Length Mean</label>
+                    <input type="text" class="form-control" id="Packet Length Mean" name="Packet Length Mean" placeholder="e.g., 64.6" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Packet Length Std" class="form-label">Packet Length Std</label>
+                    <input type="text" class="form-control" id="Packet Length Std" name="Packet Length Std" placeholder="e.g., 35.05424368" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Packet Length Variance" class="form-label">Packet Length Variance</label>
+                    <input type="text" class="form-control" id="Packet Length Variance" name="Packet Length Variance" placeholder="e.g., 1228.8" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="FIN Flag Count" class="form-label">FIN Flag Count</label>
+                    <input type="text" class="form-control" id="FIN Flag Count" name="FIN Flag Count" placeholder="e.g., 0.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="SYN Flag Count" class="form-label">SYN Flag Count</label>
+                    <input type="text" class="form-control" id="SYN Flag Count" name="SYN Flag Count" placeholder="e.g., 0.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="RST Flag Count" class="form-label">RST Flag Count</label>
+                    <input type="text" class="form-control" id="RST Flag Count" name="RST Flag Count" placeholder="e.g., 0.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="PSH Flag Count" class="form-label">PSH Flag Count</label>
+                    <input type="text" class="form-control" id="PSH Flag Count" name="PSH Flag Count" placeholder="e.g., 0.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="ACK Flag Count" class="form-label">ACK Flag Count</label>
+                    <input type="text" class="form-control" id="ACK Flag Count" name="ACK Flag Count" placeholder="e.g., 0.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="URG Flag Count" class="form-label">URG Flag Count</label>
+                    <input type="text" class="form-control" id="URG Flag Count" name="URG Flag Count" placeholder="e.g., 0.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="CWE Flag Count" class="form-label">CWE Flag Count</label>
+                    <input type="text" class="form-control" id="CWE Flag Count" name="CWE Flag Count" placeholder="e.g., 0.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="ECE Flag Count" class="form-label">ECE Flag Count</label>
+                    <input type="text" class="form-control" id="ECE Flag Count" name="ECE Flag Count" placeholder="e.g., 0.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Down/Up Ratio" class="form-label">Down/Up Ratio</label>
+                    <input type="text" class="form-control" id="Down/Up Ratio" name="Down/Up Ratio" placeholder="e.g., 1.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Average Packet Size" class="form-label">Average Packet Size</label>
+                    <input type="text" class="form-control" id="Average Packet Size" name="Average Packet Size" placeholder="e.g., 80.75" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Avg Fwd Segment Size" class="form-label">Avg Fwd Segment Size</label>
+                    <input type="text" class="form-control" id="Avg Fwd Segment Size" name="Avg Fwd Segment Size" placeholder="e.g., 39.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Avg Bwd Segment Size" class="form-label">Avg Bwd Segment Size</label>
+                    <input type="text" class="form-control" id="Avg Bwd Segment Size" name="Avg Bwd Segment Size" placeholder="e.g., 103.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Fwd Avg Bytes/Bulk" class="form-label">Fwd Avg Bytes/Bulk</label>
+                    <input type="text" class="form-control" id="Fwd Avg Bytes/Bulk" name="Fwd Avg Bytes/Bulk" placeholder="e.g., 0.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Fwd Avg Packets/Bulk" class="form-label">Fwd Avg Packets/Bulk</label>
+                    <input type="text" class="form-control" id="Fwd Avg Packets/Bulk" name="Fwd Avg Packets/Bulk" placeholder="e.g., 0.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Fwd Avg Bulk Rate" class="form-label">Fwd Avg Bulk Rate</label>
+                    <input type="text" class="form-control" id="Fwd Avg Bulk Rate" name="Fwd Avg Bulk Rate" placeholder="e.g., 0.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Bwd Avg Bytes/Bulk" class="form-label">Bwd Avg Bytes/Bulk</label>
+                    <input type="text" class="form-control" id="Bwd Avg Bytes/Bulk" name="Bwd Avg Bytes/Bulk" placeholder="e.g., 0.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Bwd Avg Packets/Bulk" class="form-label">Bwd Avg Packets/Bulk</label>
+                    <input type="text" class="form-control" id="Bwd Avg Packets/Bulk" name="Bwd Avg Packets/Bulk" placeholder="e.g., 0.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Bwd Avg Bulk Rate" class="form-label">Bwd Avg Bulk Rate</label>
+                    <input type="text" class="form-control" id="Bwd Avg Bulk Rate" name="Bwd Avg Bulk Rate" placeholder="e.g., 0.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Subflow Fwd Packets" class="form-label">Subflow Fwd Packets</label>
+                    <input type="text" class="form-control" id="Subflow Fwd Packets" name="Subflow Fwd Packets" placeholder="e.g., 2.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Subflow Fwd Bytes" class="form-label">Subflow Fwd Bytes</label>
+                    <input type="text" class="form-control" id="Subflow Fwd Bytes" name="Subflow Fwd Bytes" placeholder="e.g., 78.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Subflow Bwd Packets" class="form-label">Subflow Bwd Packets</label>
+                    <input type="text" class="form-control" id="Subflow Bwd Packets" name="Subflow Bwd Packets" placeholder="e.g., 2.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Subflow Bwd Bytes" class="form-label">Subflow Bwd Bytes</label>
+                    <input type="text" class="form-control" id="Subflow Bwd Bytes" name="Subflow Bwd Bytes" placeholder="e.g., 206.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Init_Win_bytes_forward" class="form-label">Init_Win_bytes_forward</label>
+                    <input type="text" class="form-control" id="Init_Win_bytes_forward" name="Init_Win_bytes_forward" placeholder="e.g., -1.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Init_Win_bytes_backward" class="form-label">Init_Win_bytes_backward</label>
+                    <input type="text" class="form-control" id="Init_Win_bytes_backward" name="Init_Win_bytes_backward" placeholder="e.g., -1.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="act_data_pkt_fwd" class="form-label">act_data_pkt_fwd</label>
+                    <input type="text" class="form-control" id="act_data_pkt_fwd" name="act_data_pkt_fwd" placeholder="e.g., 1.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="min_seg_size_forward" class="form-label">min_seg_size_forward</label>
+                    <input type="text" class="form-control" id="min_seg_size_forward" name="min_seg_size_forward" placeholder="e.g., 32.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Active Mean" class="form-label">Active Mean</label>
+                    <input type="text" class="form-control" id="Active Mean" name="Active Mean" placeholder="e.g., 0.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Active Std" class="form-label">Active Std</label>
+                    <input type="text" class="form-control" id="Active Std" name="Active Std" placeholder="e.g., 0.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Active Max" class="form-label">Active Max</label>
+                    <input type="text" class="form-control" id="Active Max" name="Active Max" placeholder="e.g., 0.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Active Min" class="form-label">Active Min</label>
+                    <input type="text" class="form-control" id="Active Min" name="Active Min" placeholder="e.g., 0.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Idle Mean" class="form-label">Idle Mean</label>
+                    <input type="text" class="form-control" id="Idle Mean" name="Idle Mean" placeholder="e.g., 0.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Idle Std" class="form-label">Idle Std</label>
+                    <input type="text" class="form-control" id="Idle Std" name="Idle Std" placeholder="e.g., 0.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Idle Max" class="form-label">Idle Max</label>
+                    <input type="text" class="form-control" id="Idle Max" name="Idle Max" placeholder="e.g., 0.0" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Idle Min" class="form-label">Idle Min</label>
+                    <input type="text" class="form-control" id="Idle Min" name="Idle Min" placeholder="e.g., 0.0" required>
+                </div>
             </div>
-            
-            <div>
-                <label for="total_fwd_packets" class="block text-sm font-medium text-gray-700">Total Fwd Packets</label>
-                <input type="text" id="total_fwd_packets" name="total_fwd_packets" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Enter total forward packets">
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary">Predict</button>
             </div>
-            
-            <div>
-                <label for="total_bwd_packets" class="block text-sm font-medium text-gray-700">Total Backward Packets</label>
-                <input type="text" id="total_bwd_packets" name="total_bwd_packets" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Enter total backward packets">
-            </div>
-            
-            <div>
-                <label for="total_length_fwd_packets" class="block text-sm font-medium text-gray-700">Total Length of Fwd Packets</label>
-                <input type="text" id="total_length_fwd_packets" name="total_length_fwd_packets" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Enter total length of forward packets">
-            </div>
-            
-            <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Analyze</button>
         </form>
-
         {% if prediction %}
-        <div class="mt-6 p-4 bg-gray-50 rounded-md">
-            <h2 class="text-lg font-semibold text-gray-800">Prediction Result</h2>
-            <p class="mt-2 text-gray-600">{{ prediction }}</p>
+        <div class="alert alert-success text-center" role="alert">
+            Prediction: {{ prediction }}
+        </div>
+        {% endif %}
+        {% if error %}
+        <div class="alert alert-danger text-center" role="alert">
+            Error: {{ error }}
         </div>
         {% endif %}
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
